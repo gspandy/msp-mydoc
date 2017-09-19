@@ -14,15 +14,18 @@
 
 *  [微服务开发文档](#dev-doc)
 	*  [创建微服务](#service-new)
+	*  [API Mock](#service-api-mock)
 	*  [开发微服务](#service-dev)
 		* 创建项目及初始化配置
 		* 维护远程配置文件
 		* 编写微服务代码
 		* 维护微服务部署信息
+		* 微服务注册地址及访问方式
 	*  [提交及管理代码](#code-mgmt)
 	*  [构建及发布](#service-online)
 	*  [更新微服务/版本管理](#service-update)
 	*  [下线微服务](#service-offline)
+	*  [kibana使用](#kibana-use)
 	*  [查看或监控微服务状态] (#service-monitor)
 	*  [对异构语言及非Spring Boot框架项目的支持] (#service-non-java)
 
@@ -126,6 +129,17 @@ MSP采用业界领先的Spring Cloud开源技术方案和一系列配套的分�
 	pcsd madp auth 	   [错误说明：格式错误]
 	pc_sd-madp-auth    [错误说明：空格，下划线]
 	pcsd-MADP-auth     [错误说明：大写]
+
+
+### <a name="service-api-mock"></a> API  Mock
+
+API Mock是一款API协同设计、快速生成文档、即时API模拟的工具。
+
+它能把按一定的语法编辑的API文档，模拟成真实可调用的服务；还能生成界面优美，可读性强的文档。
+
+有了此利器，前后端的小伙伴就可以并行开发。前端开发的小伙伴再也不用苦等, 后端开发的小伙伴再也不用被催啦~
+
+[点此查看](http://git.devops.lenovo.com/chenxl7/msp-userguide/blob/master/MSP-mockapi-guide.md) 详细的手册。
 
   
 ### <a name="service-dev"></a>开发微服务   
@@ -477,6 +491,21 @@ killasgroup=true             ; SIGKILL the UNIX process group (def false)
 
 注意事项：请将您本地电脑的IP加入列表，请参考[构建及发布](#service-online)
 
+#### 微服务注册地址及访问方式
+
+微服务平台提供了3套环境（开发/测试、沙箱、生产）供大家使用，对应的服务注册地址分别为：
+    
+    开发(dev)：http://10.96.83.154:8761/eureka/,http://10.96.83.165:8761/eureka/,http://10.96.83.178:8761/eureka/
+    沙箱(sandbox)：http://10.96.83.167:8761/eureka/,http://10.96.83.169:8761/eureka/,http://10.96.83.181:8761/eureka/
+    生产(dev)：http://10.96.83.8:8761/eureka/,http://10.96.83.9:8761/eureka/,http://10.96.83.10:8761/eureka/
+    
+服务注册成功后，您可以分别在 `开发：`  http://10.96.83.154:8761 ；`沙箱：` http://10.96.83.167:8761 ；`生产：` http://10.96.83.8:8761  上查找您的微服务。
+
+如果需要访问您的微服务，3套环境的baseURL见下。访问方式为：baseURL/your-service-name/your-api-name
+    
+    开发：https://api-dev.unifiedcloud.lenovo.com
+    沙箱：https://api-sandbox.unifiedcloud.lenovo.com
+    生产：https://api.unifiedcloud.lenovo.com
 
 
 ###<a name="code-mgmt"></a>提交及管理代码
@@ -585,6 +614,74 @@ killasgroup=true             ; SIGKILL the UNIX process group (def false)
 2.自行构建及部署的微服务：
 
 终止原服务的进程即可。
+
+### <a name="kibana-use"></a>kibana使用
+
+## 简介
+ Kibana是一个开源的分析与可视化平台，设计出来用于和Elasticsearch一起使用的。你可以用kibana搜索、查看、交互存放在Elasticsearch索引里的数据，使用各种不同的图表、表格、地图等kibana能够很轻易地展示高级数据分析与可视化。
+
+## 语法
+**单项term查询**
+
+例: 搜 Dahlen， Malone
+
+**字段field查询**
+
+field:value   例：city:Keyport， age:26
+
+**通配符**
+
+? 匹配单个字符      例： H?bbs
+
+* 匹配0到多个字符           例： H*
+
+注意： ? * 不能用作第一个字符，例如： ?text    *text
+
+**范围查询**
+
+age:[20 TO 30]        age:{20 TO 30}
+
+注：[ ] 表示端点数值包含在范围内，{ } 表示端点数值不包含在范围内
+
+**逻辑操作**
+
+AND     OR       例子：firstname:H* AND age:20          firstname:H* OR age:20
+
+## 查询功能
+我们进入kibana首页，可以看到Discover，Visualize，Dashboard等菜单，其实我们只需要关注这三个菜单就行了。首先，进入Discover页面，按照查询语法，查询相应的日志数据。
+![](./msp-userguide-pic/search1.png)
+
+我们可以把一些常用的查询save保存。
+
+## 视图功能
+
+我们也可以把查询出来的数据制作成一些可视化的数据统计视图，进入Visualize页面，点击New按钮，可见如下页面。
+
+![](./msp-userguide-pic/visulize1.png)
+
+我们开发人员可以选择一种类型的视图类型，这里我们选择柱状图作为示例：
+
+![](./msp-userguide-pic/visulize2.png)
+
+左侧分x轴和y轴，根据不同的字段可以组合出不同的展示形式，这个视图也可以点击save按钮保存起来，以备将来继续复用。
+
+## 综合报表功能
+
+我们学习了查询，并使用查询绘制出需要的视图，那么我们可以将一个或多个视图组合起来，便于业务人员进行汇总分析。
+进入Dashboard页面，点击New按钮，我们可以看见之前保存的那些视图列表，如图
+
+![](./msp-userguide-pic/dash1.png)
+
+点击我们需要的视图，添加到dashboard中来，保存即可生成一个新的综合报表。
+
+
+![](./msp-userguide-pic/dash2.png)
+
+
+## 总结
+
+至此，一个简单的dashboard我们就已经制作完成了。其实kibana还有很多强大的功能，各位小伙伴们可以发挥你们的探索精神和创造力，使这个工具更好的为我们的业务服务。
+
 		
 ### <a name="service-monitor"></a>查看或监控微服务状态
 
